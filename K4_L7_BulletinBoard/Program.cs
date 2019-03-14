@@ -13,7 +13,15 @@ namespace K4_L7_BulletinBoard
     {
         public DbSet<Account> Account { get; set; }
         public DbSet<Post> Post { get; set; }
+<<<<<<< HEAD
         public DbSet<Category> Category { get; set; }
+=======
+<<<<<<< HEAD
+        public DbSet<Category> Category { get; set; }
+=======
+        public DbSet<Category> Cathegory { get; set; }
+>>>>>>> 751be393c57d884684c0c1e60d464f82135f81c3
+>>>>>>> 94273cf92d2dd1665783bba09d2d595599897477
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
@@ -54,6 +62,11 @@ namespace K4_L7_BulletinBoard
         public string Name { get; set; }
     }
 
+<<<<<<< HEAD
+   
+
+=======
+>>>>>>> 751be393c57d884684c0c1e60d464f82135f81c3
     class Program
     {
         static AppDbContext database;
@@ -64,16 +77,27 @@ namespace K4_L7_BulletinBoard
             {
                 while (true)
                 {
+<<<<<<< HEAD
+                    string option = ShowMenu("What do you want to do?", new[] {
+                        "Sign in",
+                        "Create account",                       
+=======
                     string option = ShowMenu("Welcome to Bulletin Bored - for when you've got nothing better to do!", new[] {
                         "Sign In",
                         "Create Account",
+>>>>>>> 751be393c57d884684c0c1e60d464f82135f81c3
                         "Quit"
                     });
                     Console.Clear();
 
+<<<<<<< HEAD
+                    if (option == "Sign in") SignIn();
+                    else if (option == "Create account") CreateAccount();
+=======
                     if (option == "Sign In") SignIn();
                     //else if (option == "Add New Artist") CreateAccount();
                     //else if (option == "Create Account") ListAlbums();
+>>>>>>> 751be393c57d884684c0c1e60d464f82135f81c3
                     else Environment.Exit(0);
 
                     Console.WriteLine();
@@ -233,6 +257,23 @@ namespace K4_L7_BulletinBoard
 
             DateTime date = new DateTime(year, month, day);
             return date;
+        }
+
+        static void CreateAccount()
+        {
+            WriteUnderlined("Create new account");
+
+
+            Account account = new Account();
+            account.UserName = ReadString("write user name: ");
+            account.Password = ReadString("write password: ");
+ 
+
+            //UPDATE DATABASE
+            database.Add(account);
+            database.SaveChanges();
+            Console.WriteLine("The account is added.");
+
         }
     }
 }
