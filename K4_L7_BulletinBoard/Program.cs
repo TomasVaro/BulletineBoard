@@ -13,7 +13,7 @@ namespace K4_L7_BulletinBoard
     {
         public DbSet<Account> Account { get; set; }
         public DbSet<Post> Post { get; set; }
-        public DbSet<Category> Cathegory { get; set; }
+        public DbSet<Category> Category { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
@@ -86,6 +86,8 @@ namespace K4_L7_BulletinBoard
             
             Console.WriteLine("Write your username:");
             string username = Console.ReadLine();
+
+
             Console.WriteLine("Write your password:");
             string password = Console.ReadLine();
 
@@ -94,12 +96,25 @@ namespace K4_L7_BulletinBoard
             {
                 Console.WriteLine("You are logged in as " + username);
             }
-
+            
             
             
         }
 
+        static void CreateAccount()
+        {
+            WriteUnderlined("Create new account");
 
+            Account account = new Account();
+            account.UserName = ReadString("write user name: ");
+            account.Password = ReadString("write password: ");
+
+
+            //UPDATE DATABASE
+            database.Add(account);
+            database.SaveChanges();
+            Console.WriteLine("The account is added.");
+        }
 
 
 
