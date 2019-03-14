@@ -35,6 +35,19 @@ namespace K4_L7_BulletinBoard
     
     }
 
+    public class Post
+
+    {
+        [Key]
+        public int ID { get; set; }
+        public Category Category { get; set; }
+        public string Name { get; set; }
+        public string Content { get; set; }
+        public Account Account { get; set; }
+        public int Like { get; set; }
+        public DateTime Date { get; set; }
+    }
+
     public class Artist
     {
         [Key]
