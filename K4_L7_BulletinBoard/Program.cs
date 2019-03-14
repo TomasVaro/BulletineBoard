@@ -13,11 +13,15 @@ namespace K4_L7_BulletinBoard
     {
         public DbSet<Account> Account { get; set; }
         public DbSet<Post> Post { get; set; }
+<<<<<<< HEAD
         public DbSet<Category> Category { get; set; }
+=======
+        public DbSet<Category> Cathegory { get; set; }
+>>>>>>> 751be393c57d884684c0c1e60d464f82135f81c3
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseSqlServer(@"Data Source=den1.mssql8.gear.host;Initial Catalog=bulletineboard;Persist Security Info=True;User ID=bulletineboard;Password=***********");
+            options.UseSqlServer(@"Data Source=den1.mssql8.gear.host;Initial Catalog=bulletineboard;Persist Security Info=True;User ID=bulletineboard;Password=Gh80-nc!1lSi");
         }
 
         protected override void OnModelCreating(ModelBuilder model)
@@ -36,7 +40,6 @@ namespace K4_L7_BulletinBoard
     }
 
     public class Post
-
     {
         [Key]
         public int ID { get; set; }
@@ -55,8 +58,11 @@ namespace K4_L7_BulletinBoard
         public string Name { get; set; }
     }
 
+<<<<<<< HEAD
    
 
+=======
+>>>>>>> 751be393c57d884684c0c1e60d464f82135f81c3
     class Program
     {
         static AppDbContext database;
@@ -67,21 +73,54 @@ namespace K4_L7_BulletinBoard
             {
                 while (true)
                 {
+<<<<<<< HEAD
                     string option = ShowMenu("What do you want to do?", new[] {
                         "Sign in",
                         "Create account",                       
+=======
+                    string option = ShowMenu("Welcome to Bulletin Bored - for when you've got nothing better to do!", new[] {
+                        "Sign In",
+                        "Create Account",
+>>>>>>> 751be393c57d884684c0c1e60d464f82135f81c3
                         "Quit"
                     });
                     Console.Clear();
 
+<<<<<<< HEAD
                     if (option == "Sign in") SignIn();
                     else if (option == "Create account") CreateAccount();
+=======
+                    if (option == "Sign In") SignIn();
+                    //else if (option == "Add New Artist") CreateAccount();
+                    //else if (option == "Create Account") ListAlbums();
+>>>>>>> 751be393c57d884684c0c1e60d464f82135f81c3
                     else Environment.Exit(0);
 
                     Console.WriteLine();
                 }
             }
         }
+
+        static void SignIn()
+        {
+            
+            Console.WriteLine("Write your username:");
+            string username = Console.ReadLine();
+            Console.WriteLine("Write your password:");
+            string password = Console.ReadLine();
+
+            var user = database.Account.Where(a => a.UserName == username && a.Password == password);
+            foreach(var a in user)
+            {
+                Console.WriteLine("You are logged in as " + username);
+            }
+
+            
+            
+        }
+
+
+
 
 
         static string ShowMenu(string prompt, string[] options)
