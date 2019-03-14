@@ -11,14 +11,13 @@ namespace K4_L7_BulletinBoard
 {
     public class AppDbContext : DbContext
     {
-        //public DbSet<Artist> Artist { get; set; }
-        //public DbSet<Album> Album { get; set; }
-        //public DbSet<Song> Song { get; set; }
-        //public DbSet<Producer> Producer { get; set; }
+        public DbSet<Account> Account { get; set; }
+        public DbSet<Post> Post { get; set; }
+        public DbSet<Cathegory> Cathegory { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            //options.UseSqlServer(@"Data Source=(local)\SQLEXPRESS;Initial Catalog=EFMusic;Integrated Security=True");
+            options.UseSqlServer(@"Data Source=den1.mssql8.gear.host;Initial Catalog=bulletineboard;Persist Security Info=True;User ID=bulletineboard;Password=***********");
         }
 
         protected override void OnModelCreating(ModelBuilder model)
