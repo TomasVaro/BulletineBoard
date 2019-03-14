@@ -48,6 +48,13 @@ namespace K4_L7_BulletinBoard
         public DateTime Date { get; set; }
     }
 
+    public class Category
+    {
+        [Key]
+        public int ID { get; set; }
+        public string Name { get; set; }
+    }
+
     public class Artist
     {
         [Key]
