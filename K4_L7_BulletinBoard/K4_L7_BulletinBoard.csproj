@@ -126,13 +126,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\20190314124700_First.cs" />
-    <Compile Include="Migrations\20190314124700_First.designer.cs">
-      <DependentUpon>20190314124700_First.cs</DependentUpon>
+    <Compile Include="Migrations\20190314141056_First.cs" />
+    <Compile Include="Migrations\20190314141056_First.designer.cs">
+      <DependentUpon>20190314141056_First.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20190314134320_Update.cs" />
-    <Compile Include="Migrations\20190314134320_Update.designer.cs">
-      <DependentUpon>20190314134320_Update.cs</DependentUpon>
+    <Compile Include="Migrations\20190314205611_ChangedClasses.cs" />
+    <Compile Include="Migrations\20190314205611_ChangedClasses.designer.cs">
+      <DependentUpon>20190314205611_ChangedClasses.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190315082028_ChangedClassAccount.cs" />
+    <Compile Include="Migrations\20190315082028_ChangedClassAccount.designer.cs">
+      <DependentUpon>20190315082028_ChangedClassAccount.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\AppDbContextModelSnapshot.cs" />
     <Compile Include="Program.cs" />

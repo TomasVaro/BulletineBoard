@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace K4_L7_BulletinBoard.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20190314124700_First")]
+    [Migration("20190314141056_First")]
     partial class First
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,7 +46,7 @@ namespace K4_L7_BulletinBoard.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Cathegory");
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("K4_L7_BulletinBoard.Post", b =>

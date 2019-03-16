@@ -17,7 +17,7 @@ namespace K4_L7_BulletinBoard
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseSqlServer(@"Data Source=den1.mssql8.gear.host;Initial Catalog=bulletineboard;Persist Security Info=True;User ID=bulletineboard;Password=Gh80-nc!1lSi");
+            options.UseSqlServer(@"Data Source=(local)\SQLEXPRESS;Initial Catalog=BulletineBoard;Integrated Security=True");
         }
 
         protected override void OnModelCreating(ModelBuilder model)
@@ -30,7 +30,12 @@ namespace K4_L7_BulletinBoard
     {
         [Key]
         public int ID { get; set; }
-        public string UserName { get; set; }
+        [Required]
+        [MaxLength(10)]
+        public string Username { get; set; }
+        [Required]
+        [MinLength(5)]
+        [MaxLength(15)]
         public string Password { get; set; }
     
     }
@@ -39,11 +44,16 @@ namespace K4_L7_BulletinBoard
     {
         [Key]
         public int ID { get; set; }
+        [Required]
         public Category Category { get; set; }
+        [MaxLength(100)]
+        [Required]
         public string Name { get; set; }
+        [Required]
         public string Content { get; set; }
+        [Required]
         public Account Account { get; set; }
-        public int Like { get; set; }
+        public int? Like { get; set; }
         public DateTime Date { get; set; }
     }
 
@@ -51,6 +61,8 @@ namespace K4_L7_BulletinBoard
     {
         [Key]
         public int ID { get; set; }
+        [Required]
+        [MaxLength(50)]
         public string Name { get; set; }
     }
 
@@ -58,6 +70,7 @@ namespace K4_L7_BulletinBoard
     class Program
     {
         static AppDbContext database;
+        static Account logedInUser;
 
         static void Main(string[] args)
         {
@@ -65,15 +78,16 @@ namespace K4_L7_BulletinBoard
             {
                 while (true)
                 {
-                    string option = ShowMenu("Welcome to Bulletin Bored - for when you've got nothing better to do!", new[] {
+                    WriteUnderlined("Welcome to Bulletin Bored - for when you've got nothing better to do!");
+                    string option = ShowMenu("", new[] {
                         "Sign In",
                         "Create Account",
                         "Quit"
                     });
                     Console.Clear();
 
-                    if (option == "Sign in") SignIn();
-                    else if (option == "Create account") CreateAccount();
+                    if (option == "Sign In") SignIn();
+                    else if (option == "Create Account") CreateAccount();
                     else Environment.Exit(0);
 
                     Console.WriteLine();
@@ -83,22 +97,36 @@ namespace K4_L7_BulletinBoard
 
         static void SignIn()
         {
-            
-            Console.WriteLine("Write your username:");
-            string username = Console.ReadLine();
+            Account account = new Account();
+            account.Username = ReadString("Write your username");
+
+            Account[] users = database.Account.ToArray();
 
 
-            Console.WriteLine("Write your password:");
-            string password = Console.ReadLine();
-
-            var user = database.Account.Where(a => a.UserName == username && a.Password == password);
-            foreach(var a in user)
+            if (users.Select(u => u.Username).Contains(account.Username))
             {
-                Console.WriteLine("You are logged in as " + username);
+                Account selectedUser = users.First(u => u.Username == account.Username);
+                account.Password  = ReadString("Enter password");
+
+                if(account.Password == selectedUser.Password)
+                {
+                    logedInUser = selectedUser;
+                    Console.Clear();
+                    Console.WriteLine("You are now logged in as " + account.Username);
+                    Console.WriteLine();
+                    MainMenu();
+                }
+                else
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("The password is not korrect. Please try again or create a new account!");
+                }
             }
-            
-            
-            
+            else
+            {
+                Console.WriteLine();
+                Console.WriteLine("You don't have an account. Create a new one or sign in with another username!");
+            }            
         }
 
         static void CreateAccount()
@@ -106,17 +134,64 @@ namespace K4_L7_BulletinBoard
             WriteUnderlined("Create new account");
 
             Account account = new Account();
-            account.UserName = ReadString("write user name: ");
-            account.Password = ReadString("write password: ");
+            account.Username = ReadString("Choose username");
+            account.Password = ReadString("Choose password");
 
 
             //UPDATE DATABASE
             database.Add(account);
             database.SaveChanges();
-            Console.WriteLine("The account is added.");
+            Console.WriteLine();
+            Console.WriteLine("You are now logged in as " + account.Username);
         }
 
+        static void MainMenu()
+        {
+            WriteUnderlined("Main menu");
+            string option = ShowMenu("Choose what to do?", new[] {
+                "Most Recent Posts",
+                "Most Popular Posts",
+                "Posts by Category",
+                "Search",
+                "Create a Post",
+                "Quit"
+                });
+            Console.Clear();
 
+            if (option == "Most Recent Posts") MostRecentPosts();
+            else if (option == "Most Popular Posts") MostPopularPosts();
+            else if (option == "Posts by Category") PostsByCategory();
+            else if (option == "Search") Search();
+            else if (option == "Create a Post") CreatePost();
+            else Environment.Exit(0);
+
+            Console.WriteLine();
+        }
+
+        private static void CreatePost()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void Search()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void PostsByCategory()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void MostPopularPosts()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void MostRecentPosts()
+        {
+            throw new NotImplementedException();
+        }
 
         static string ShowMenu(string prompt, string[] options)
         {
@@ -233,23 +308,6 @@ namespace K4_L7_BulletinBoard
 
             DateTime date = new DateTime(year, month, day);
             return date;
-        }
-
-        static void CreateAccount()
-        {
-            WriteUnderlined("Create new account");
-
-
-            Account account = new Account();
-            account.UserName = ReadString("write user name: ");
-            account.Password = ReadString("write password: ");
- 
-
-            //UPDATE DATABASE
-            database.Add(account);
-            database.SaveChanges();
-            Console.WriteLine("The account is added.");
-
-        }
+        }        
     }
 }

@@ -23,7 +23,7 @@ namespace K4_L7_BulletinBoard.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Cathegory",
+                name: "Category",
                 columns: table => new
                 {
                     ID = table.Column<int>(nullable: false)
@@ -32,7 +32,7 @@ namespace K4_L7_BulletinBoard.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cathegory", x => x.ID);
+                    table.PrimaryKey("PK_Category", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -58,9 +58,9 @@ namespace K4_L7_BulletinBoard.Migrations
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Post_Cathegory_CategoryID",
+                        name: "FK_Post_Category_CategoryID",
                         column: x => x.CategoryID,
-                        principalTable: "Cathegory",
+                        principalTable: "Category",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -85,7 +85,7 @@ namespace K4_L7_BulletinBoard.Migrations
                 name: "Account");
 
             migrationBuilder.DropTable(
-                name: "Cathegory");
+                name: "Category");
         }
     }
 }
