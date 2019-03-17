@@ -138,6 +138,10 @@
     <Compile Include="Migrations\20190315082028_ChangedClassAccount.designer.cs">
       <DependentUpon>20190315082028_ChangedClassAccount.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20190317013519_Last.cs" />
+    <Compile Include="Migrations\20190317013519_Last.designer.cs">
+      <DependentUpon>20190317013519_Last.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\AppDbContextModelSnapshot.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

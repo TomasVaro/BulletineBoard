@@ -19,11 +19,6 @@ namespace K4_L7_BulletinBoard
         {
             options.UseSqlServer(@"Data Source=(local)\SQLEXPRESS;Initial Catalog=BulletineBoard;Integrated Security=True");
         }
-
-        protected override void OnModelCreating(ModelBuilder model)
-        {
-            //model.Entity<AlbumProducer>().HasKey(ap => new { ap.AlbumID, ap.ProducerID });
-        }
     }
 
     public class Account
@@ -66,7 +61,6 @@ namespace K4_L7_BulletinBoard
         public string Name { get; set; }
     }
 
-
     class Program
     {
         static AppDbContext database;
@@ -102,10 +96,10 @@ namespace K4_L7_BulletinBoard
 
             Account[] users = database.Account.ToArray();
 
-
             if (users.Select(u => u.Username).Contains(account.Username))
             {
                 Account selectedUser = users.First(u => u.Username == account.Username);
+
                 account.Password  = ReadString("Enter password");
 
                 if(account.Password == selectedUser.Password)
@@ -135,14 +129,22 @@ namespace K4_L7_BulletinBoard
 
             Account account = new Account();
             account.Username = ReadString("Choose username");
+            Account[] users = database.Account.ToArray();
+            if (users.Select(u => u.Username).Contains(account.Username))
+            {
+                Console.WriteLine();
+                Console.WriteLine("That username is already taken. Please choose another username");
+                Console.WriteLine();
+                CreateAccount();
+            }
             account.Password = ReadString("Choose password");
-
-
-            //UPDATE DATABASE
+            
             database.Add(account);
             database.SaveChanges();
-            Console.WriteLine();
+            Console.Clear();
             Console.WriteLine("You are now logged in as " + account.Username);
+            Console.WriteLine();
+            MainMenu();
         }
 
         static void MainMenu()
@@ -154,6 +156,7 @@ namespace K4_L7_BulletinBoard
                 "Posts by Category",
                 "Search",
                 "Create a Post",
+                "Delete a Post",
                 "Quit"
                 });
             Console.Clear();
@@ -163,40 +166,212 @@ namespace K4_L7_BulletinBoard
             else if (option == "Posts by Category") PostsByCategory();
             else if (option == "Search") Search();
             else if (option == "Create a Post") CreatePost();
+            else if (option == "Delete a Post") DeletePost();
             else Environment.Exit(0);
 
             Console.WriteLine();
         }
 
-        private static void CreatePost()
+        private static void DeletePost()
         {
-            throw new NotImplementedException();
+            WriteUnderlined("Delete posts created by you");
+            Console.WriteLine();
+
+            string[] postsByLogedInUser = database.Post.Include(p => p.Account).Where(p => p.Account.Username == logedInUser.Username).Select(p => p.Name).ToArray();
+            string postNameToDelete = ShowMenu("Which post do you want to delete?", postsByLogedInUser);
+            var postToDelete = database.Post.Include(p => p.Account).Include(p => p.Category).First(p => p.Name == postNameToDelete);
+
+            database.Remove(postToDelete);
+            database.SaveChanges();
+
+            Console.Clear();
+            Console.WriteLine($"\"{postNameToDelete}\" succesfully deleted!");
+            Console.WriteLine();
+            MainMenu();
+        }
+
+        private static void CreatePost()
+       {
+            database.Post.Include(p => p.Category);
+            database.Post.Include(p => p.Account);
+
+            Post post = new Post();
+
+            string[] categories = database.Category.Select(c => c.Name).ToArray();
+            string selectedCategoryName = ShowMenu("Select category", categories);
+            Console.WriteLine();
+
+            Category selectedCategory = database.Category.First(c => c.Name == selectedCategoryName);
+
+            post.Category = selectedCategory;
+            post.Account = logedInUser;
+            post.Name = ReadString("Write title");
+            post.Content = ReadString("Write text");
+            post.Like = 0;
+            post.Date = DateTime.Now;
+
+            database.Add(post);
+            database.SaveChanges();
+            Console.Clear();
+            Console.WriteLine("The post is added.");
+            Console.WriteLine();
+            MainMenu();
         }
 
         private static void Search()
         {
-            throw new NotImplementedException();
+            if (database.Post.Count() == 0)
+            {
+                Console.WriteLine("There are no posts in the database.");
+            }
+            else
+            {
+                WriteUnderlined("Search");
+                Console.WriteLine();
+                string searchWord = ReadString("Word or phrase");
+                Console.Clear();
+
+                WriteUnderlined("Post containing \"" + searchWord + "\"");
+                Post[] contents = database.Post.Where(p => p.Content.Contains(searchWord)).ToArray();
+
+                if(contents.Count() == 0)
+                {
+                    Console.WriteLine("There were no posts containing \"" + searchWord + "\"");
+                }
+                else
+                {
+                    foreach (var c in contents)
+                    {
+                        Console.WriteLine(c.Content);
+                    }
+                }                
+            }
+            Console.WriteLine();
+            MainMenu();
         }
 
         private static void PostsByCategory()
         {
-            throw new NotImplementedException();
+            WriteUnderlined("Select Category");
+
+            Category category = new Category();
+
+            string[] postCategories = database.Category.Select(c => c.Name).ToArray();
+
+            postCategories = postCategories.Concat(new string[] { "Return to Main Menu" }).ToArray();
+            string option = ShowMenu("", postCategories);
+            Console.Clear();
+
+            if (option == "Return to Main Menu") MainMenu();
+
+            string[] postNames = database.Post
+                .Where(p => p.Category.Name == option)
+                .Select(p => p.Name)
+                .ToArray();
+            postNames = postNames.Concat(new string[] { "Return to Category", "Return to Main Menu" }).ToArray();
+
+            WriteUnderlined("Posts in Category \"" + option + "\"");
+            string selectedPostName = ShowMenu("", postNames);
+            Console.Clear();
+
+            if (selectedPostName == "Return to Category") PostsByCategory();
+            else if (selectedPostName == "Return to Main Menu") MainMenu();
+
+            Post selectedPost = database.Post.First(p => p.Name == selectedPostName);
+            WriteUnderlined("Post in \"" + selectedPostName + "\"");
+            Console.WriteLine();
+            Console.WriteLine(selectedPost.Content);
+            Console.WriteLine();
+
+            string option2 = ShowMenu("", new[] {
+                    "Like this Post",
+                    "Return to Category",
+                    "Return to Main Menu"
+                });
+            Console.Clear();
+
+            if (option2 == "Like this Post") LikeThisPost(selectedPost);
+            else if (option2 == "Return to Category") PostsByCategory();
+            else if (option2 == "Return to Main Menu") MainMenu();
         }
 
         private static void MostPopularPosts()
         {
-            throw new NotImplementedException();
+            if (database.Post.Count() == 0)
+            {
+                Console.WriteLine("There are no posts in the database.");
+            }
+            else
+            {
+                WriteUnderlined("Most Popular Posts");
+
+                Post[] posts = database.Post.OrderBy(p => p.Like).ToArray();
+                posts = posts.Reverse().ToArray();  //Reverse puts most Likes first
+                foreach (var p in posts)
+                {
+                    Console.WriteLine("Likes " + p.Like + "; Name: \"" + p.Name + "\" ; Content: " + p.Content);
+                }
+            }
+            Console.WriteLine();
+            MainMenu();
         }
 
         private static void MostRecentPosts()
         {
-            throw new NotImplementedException();
+            if (database.Post.Count() == 0)
+                {
+                    Console.WriteLine("There are no posts in the database.");
+                }
+            else while (true)
+                {
+                    WriteUnderlined("Most Recent Posts");
+                    var postNames = database.Post.Select(p => p.Name).ToArray();
+
+                    //"Reverse" puts newest Post first. "Return to Main Menu" added to postNames-array
+                    postNames = postNames.Reverse().Concat(new string[] { "Return to Main Menu" }).ToArray();
+                    string postName = ShowMenu("", postNames);
+                    Console.Clear();
+                    if (postName == "Return to Main Menu")
+                    {
+                        MainMenu();
+                    }
+
+                    WriteUnderlined(postName);
+                    Console.WriteLine(database.Post.First(p => p.Name == postName).Content);
+                    Console.WriteLine();
+
+                    database.Post.Include(p => p.Category).ToArray();
+                    database.Post.Include(p => p.Account).ToArray();
+                    Post post = new Post();
+                    post = database.Post.First(p => p.Name == postName);
+
+                    Console.WriteLine("Posted by " + post.Account.Username + " in Category \"" + post.Category.Name
+                        + "\" at " + post.Date.Hour + ":" + post.Date.Minute + " (" + post.Like + " likes)");
+
+                    string option = ShowMenu("", new[] {
+                        "Like this Post",
+                        "Return to List",
+                        "Return to Main Menu"
+                    });
+                    Console.Clear();
+
+                    if (option == "Like this Post") LikeThisPost(post);
+                    else if (option == "Return to Main Menu") MainMenu();
+                }
+            Console.WriteLine();
+            MainMenu();
+        }
+
+        private static void LikeThisPost(Post post)
+        {
+            post.Like++;
+            database.Update(post);
+            database.SaveChanges();
         }
 
         static string ShowMenu(string prompt, string[] options)
         {
             Console.WriteLine(prompt);
-
             int selected = 0;
 
             // Hide the cursor that will blink after calling ReadKey.
@@ -253,61 +428,5 @@ namespace K4_L7_BulletinBoard
             Console.Write(prompt + ": ");
             return Console.ReadLine();
         }
-
-        static int ReadInt(string prompt)
-        {
-            Console.Write(prompt + ": ");
-            int? number = null;
-            while (number == null)
-            {
-                string input = Console.ReadLine();
-                try
-                {
-                    number = int.Parse(input);
-                }
-                catch
-                {
-                    Console.Write("Please enter a valid integer: ");
-                }
-            }
-
-            return (int)number;
-        }
-
-        static bool ReadBool(string prompt)
-        {
-            Console.Write(prompt + ": ");
-            bool? value = null;
-            while (value == null)
-            {
-                string input = Console.ReadLine();
-                if (input.ToUpper() == "Y")
-                {
-                    value = true;
-                }
-                else if (input.ToUpper() == "N")
-                {
-                    value = false;
-                }
-                else
-                {
-                    Console.Write("Please enter either Y or N: ");
-                }
-            }
-
-            return (bool)value;
-        }
-
-        static DateTime ReadDate(string prompt)
-        {
-            Console.WriteLine(prompt + ": ");
-
-            int year = ReadInt("- Year");
-            int month = ReadInt("- Month (1-12)");
-            int day = ReadInt("- Day (1-31)");
-
-            DateTime date = new DateTime(year, month, day);
-            return date;
-        }        
     }
 }
