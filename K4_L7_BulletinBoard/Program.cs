@@ -365,7 +365,6 @@ namespace K4_L7_BulletinBoard
         private static void LikeThisPost(Post post)
         {
             post.Like++;
-            database.Update(post);
             database.SaveChanges();
         }
 
